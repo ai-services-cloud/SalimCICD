@@ -1,0 +1,29 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .NAME }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: {{ .NAME }}
+        service: hello-world
+    spec:
+      imagePullSecrets:
+        - name: docker-registry-key
+      containers:
+        - name: hello-world
+          image: {{ .IMAGE_URL }}
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsNonRoot: true
+          ports:
+            - containerPort: 4000
+          env:
+            - name: MYSUPERSECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .NAME }}-secret
+                  key: mysupersecret
